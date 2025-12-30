@@ -1,0 +1,47 @@
+module digital_clock_12hr_alt (
+    input clk,          // 1 Hz clock
+    input reset,
+    output reg [5:0] seconds,
+    output reg [5:0] minutes,
+    output reg [3:0] hours,
+    output reg am_pm     // 0 = AM, 1 = PM
+);
+
+always @(posedge clk or posedge reset) begin
+    if (reset) begin
+        seconds <= 0;
+        minutes <= 0;
+        hours   <= 1;
+        am_pm   <= 0;   // AM
+    end else begin
+        // Seconds
+        if (seconds == 59) begin
+            seconds <= 0;
+
+            // Minutes
+            if (minutes == 59) begin
+                minutes <= 0;
+
+                // Hours
+                if (hours == 11) begin
+                    hours <= 12;
+                    am_pm <= ~am_pm;   // Toggle AM/PM
+                end
+                else if (hours == 12) begin
+                    hours <= 1;
+                end
+                else begin
+                    hours <= hours + 1;
+                end
+
+            end else begin
+                minutes <= minutes + 1;
+            end
+
+        end else begin
+            seconds <= seconds + 1;
+        end
+    end
+end
+
+endmodule
